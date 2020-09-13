@@ -1,0 +1,16 @@
+version: 2.1
+description: Sample orb number 1
+
+commands:
+  hello:
+    description: sample-orb-1
+    parameters:
+      username:
+        type: string
+        description: your name
+    steps:
+      - run: 
+          name: sample-orb-1
+          command: |
+            USERNAME="$(echo << parameters.username >>)"
+            echo "Hello ${USERNAME}"

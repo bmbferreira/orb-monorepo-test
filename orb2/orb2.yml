@@ -1,0 +1,16 @@
+version: 2.1
+description: Sample orb number 2
+
+commands:
+  hello:
+    description: sample-orb-2
+    parameters:
+      age:
+        type: string
+        description: your age
+    steps:
+      - run: 
+          name: sample-orb-2
+          command: |
+            AGE="$(echo << parameters.age >>)"
+            echo "You are ${AGE} years old."

@@ -1,0 +1,24 @@
+version: 2.1
+orbs:
+  cli: circleci/circleci-cli@0.1.7
+  orb-tools: circleci/orb-tools@10.0.0
+executors:
+  cli:
+    docker:
+      - image: 'circleci/circleci-cli:latest'
+    working_directory: /tmp/orbs
+
+jobs:
+  validate:
+    executor: cli
+    steps:
+      - checkout
+      - run:
+          name: Check config for all orbs
+          command: |
+            find . -type f -name "*yml" ! -path "*/.circleci" ! -path "*/.circleci/*" | while read config; do circleci orb validate ${config}; done
+   
+workflows:
+  build:
+    jobs:
+      - validate
