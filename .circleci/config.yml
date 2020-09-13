@@ -17,8 +17,39 @@ jobs:
           name: Check config for all orbs
           command: |
             find . -type f -name "*yml" ! -path "*/.circleci" ! -path "*/.circleci/*" | while read config; do circleci orb validate ${config}; done
-   
+  publish-orb:
+    parameters:
+      working_directory:
+        type: string
+      orb-name:
+        type: string  
+    working_directory: << parameters.working_directory >>
+    executor: cli
+    steps:
+      - orb-tools/dev-promote-from-commit-subject:
+          orb-name:  << parameters.orb-name >>
+          add-pr-comment: false
+          fail-if-semver-not-indicated: false
 workflows:
   build:
     jobs:
       - validate
+      - publish-orb:
+          working_directory: "/tmp/orbs/orb1"          
+          orb-name: "bmbferreira/orb1"
+          filters:
+            branches:
+              only: master
+          requires:
+            - validate
+      - publish-orb:
+          working_directory: "/tmp/orbs/orb2"          
+          orb-name: "bmbferreira/orb2"
+          filters:
+            branches:
+              only: master
+          requires:
+            - validate
+          
+          
+          
