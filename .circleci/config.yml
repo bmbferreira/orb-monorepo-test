@@ -13,7 +13,37 @@ master_only: &master_only
   filters:
     branches:
       only: master
-  
+
+orb1_pre_steps: &orb1_pre_steps
+  pre-steps: 
+    - checkout
+    - files-changed:
+        path: "orb1/orb1.yml"
+
+orb2_pre_steps: &orb2_pre_steps
+  pre-steps: 
+    - checkout
+    - files-changed:
+        path: "orb2/orb2.yml"
+
+commands:
+  files-changed:
+    parameters:
+      path:
+        type: string
+    steps:
+      - run:
+          command: |
+            changes() {
+              git diff --name-only --diff-filter=AMDR --cached @~..@
+            }
+            changes | grep << parameters.path >>
+            exit_code=$?
+            if [ $exit_code -ne 0 ]; then
+              echo "The path << parameters.path >> was not modified. Will skip build of orb."
+              circleci step halt
+            }
+
 jobs:
   publish-orb:
     parameters:
@@ -32,6 +62,7 @@ workflows:
   build:
     jobs:
       - orb-tools/publish-dev:
+          <<: *orb1_pre_steps
           name: "publish-dev-orb-1"
           workspace-root: "/home/circleci/project"
           orb-path: "orb1/orb1.yml"          
@@ -39,6 +70,7 @@ workflows:
           orb-name: "bmbferreira/orb1"
           checkout: true
       - orb-tools/publish-dev:
+          <<: *orb2_pre_steps
           name: "publish-dev-orb-2"
           workspace-root: "/home/circleci/project"
           orb-path: "orb2/orb2.yml"          
@@ -52,6 +84,7 @@ workflows:
             - publish-dev-orb-2
           <<: *master_only
       - publish-orb:
+          <<: *orb1_pre_steps
           name: "publish-orb-1"
           working_directory: "/tmp/orbs/orb1"          
           orb-name: "bmbferreira/orb1"
@@ -59,6 +92,7 @@ workflows:
           requires:
             - apply-approval
       - publish-orb:
+          <<: *orb2_pre_steps
           name: "publish-orb-2"
           working_directory: "/tmp/orbs/orb2"          
           orb-name: "bmbferreira/orb2"
