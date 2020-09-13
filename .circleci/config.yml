@@ -33,15 +33,15 @@ workflows:
     jobs:
       - orb-tools/publish-dev:
           name: "publish-dev-orb-1"
-          workspace-root: "/tmp/orbs/orb1"
-          orb-path: "/tmp/orbs/orb1/orb1.yml"          
+          workspace-root: "orb1"
+          orb-path: "orb1.yml"          
           validate: true
           orb-name: "bmbferreira/orb1"
           checkout: true
       - orb-tools/publish-dev:
           name: "publish-dev-orb-2"
-          workspace-root: "/tmp/orbs/orb2"
-          orb-path: "/tmp/orbs/orb2/orb2.yml"          
+          workspace-root: "orb2"
+          orb-path: "orb2.yml"          
           validate: true
           orb-name: "bmbferreira/orb2"
           checkout: true
