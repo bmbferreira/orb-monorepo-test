@@ -1,6 +1,5 @@
 version: 2.1
 description: Sample orb number 2
-# test orb 2
 commands:
   hello:
     description: sample-orb-2
