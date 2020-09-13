@@ -35,7 +35,7 @@ commands:
       - run:
           command: |
             changes() {
-              git diff --name-only --diff-filter=AMDR --cached @~..@
+              git diff --name-only --diff-filter=AMDR @~..@
             }
             changes | grep << parameters.path >>
             exit_code=$?
