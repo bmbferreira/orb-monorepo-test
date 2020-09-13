@@ -8,15 +8,13 @@ executors:
       - image: 'circleci/circleci-cli:latest'
     working_directory: /tmp/orbs
 
+
+master_only: &master_only
+  filters:
+    branches:
+      only: master
+  
 jobs:
-  validate:
-    executor: cli
-    steps:
-      - checkout
-      - run:
-          name: Check config for all orbs
-          command: |
-            find . -type f -name "*yml" ! -path "*/.circleci" ! -path "*/.circleci/*" | while read config; do circleci orb validate ${config}; done
   publish-orb:
     parameters:
       working_directory:
@@ -29,27 +27,42 @@ jobs:
       - orb-tools/dev-promote-from-commit-subject:
           orb-name:  << parameters.orb-name >>
           add-pr-comment: false
-          fail-if-semver-not-indicated: false
+          fail-if-semver-not-indicated: true
 workflows:
   build:
     jobs:
-      - validate
+      - orb-tools/publish-dev:
+          name: "publish-dev-orb-1"
+          workspace-root: "/tmp/orbs/orb1"
+          orb-path: "orb1.yml"          
+          validate: true
+          orb-name: "bmbferreira/orb1"
+      - orb-tools/publish-dev:
+          name: "publish-dev-orb-2"
+          workspace-root: "/tmp/orbs/orb2"
+          orb-path: "orb2.yml"          
+          validate: true
+          orb-name: "bmbferreira/orb2"
+      - apply-approval:
+          type: approval
+          requires:
+            - publish-dev-orb-1
+            - publish-dev-orb-2
+          <<: *master_only
       - publish-orb:
+          name: "publish-orb-1"
           working_directory: "/tmp/orbs/orb1"          
           orb-name: "bmbferreira/orb1"
-          filters:
-            branches:
-              only: master
+          <<: *master_only
           requires:
-            - validate
+            - apply-approval
       - publish-orb:
+          name: "publish-orb-2"
           working_directory: "/tmp/orbs/orb2"          
           orb-name: "bmbferreira/orb2"
-          filters:
-            branches:
-              only: master
+          <<: *master_only
           requires:
-            - validate
+            - apply-approval
           
           
           
