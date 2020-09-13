@@ -33,6 +33,7 @@ commands:
         type: string
     steps:
       - run:
+          shell: /bin/sh
           command: |
             changes() {
               git diff --name-only --diff-filter=AMDR @~..@
