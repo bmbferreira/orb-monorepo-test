@@ -1,3 +1,3 @@
 # orb-monorepo-test
 
-Test orb publishing for multiple orbs within the same repo.
+Sample project to test CircleCI orb publishing for multiple orbs within the same repo.
